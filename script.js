@@ -2,20 +2,29 @@
 
 ticks = document.getElementById('ticks')
 button = document.getElementById('button')
-audio = document.getElementById('audio')
+
 
 // Global variables
 
-clock = undefined
-value = undefined
+let clock = undefined
+let interval = undefined
+let playing = false
+
+let expected_time = 0;
 
 // Functions
 
 function launchMetronome(event) {
     button.removeEventListener("click", launchMetronome);
 
-    value = ticks.value; // interval in ns
-    clock = setInterval(beep, getIntervalNs(value));
+    interval = getIntervalNs(ticks.value);
+    playing = true;
+    
+    expected_time = Date.now() + interval;
+
+    beep();
+
+    clock = setTimeout(callbacking(beep), interval);
 
     button.innerText = "Stop";
     button.addEventListener("click", stopMetronome);
@@ -23,21 +32,47 @@ function launchMetronome(event) {
 }
 
 function stopMetronome(event) {
+    playing = false;
     button.removeEventListener("click", stopMetronome);
 
-    clearInterval(clock);
+    clearTimeout(clock);
     clock = undefined;
-    value = undefined;
+    interval = undefined;
 
     button.innerText = "Start";
     button.addEventListener("click", launchMetronome);
 }
 
-function beep() {
-    audio.pause();
-    audio.currentTime = 0;
+function callbacking(func) {
+    return () => {
+        if (!playing) return;
+
+        interval = getIntervalNs(ticks.value);
+        expected_time = expected_time + interval
+        clock = setTimeout(callbacking(beep), expected_time - Date.now());
+
+        func();
+    }
+}
+
+async function beep() {
+    let audio = new Audio("./beep.mp3")
     audio.play();
 }
+
+// function beep() {
+//     if (!playing) return;
+
+//     new Promise(() => {audio.pause(); audio.currentTime = 0; audio.play()})
+
+//     value = ticks.value;
+//     ns = getIntervalNs(value);
+//     true_ns = Math.max(ns - (new Date() - start_time) - (start_time - end_time - ns), 0);
+//     console.log(true_ns, new Date() - end_time - ns, new Date() - start_time)
+//     clock = setTimeout(beep, true_ns);
+//     end_time = new Date()
+//     // console.log(clock, getIntervalNs(value), new Date() - t2)
+// }
 
 // Utils
 
@@ -48,3 +83,4 @@ function getIntervalNs(ticks) {
 // Event listeners
 
 button.addEventListener("click", launchMetronome);
+
