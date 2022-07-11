@@ -28,7 +28,6 @@ function launchMetronome(event) {
 
     button.innerText = "Stop";
     button.addEventListener("click", stopMetronome);
-    console.log("added")
 }
 
 function stopMetronome(event) {
@@ -60,20 +59,6 @@ async function beep() {
     audio.play();
 }
 
-// function beep() {
-//     if (!playing) return;
-
-//     new Promise(() => {audio.pause(); audio.currentTime = 0; audio.play()})
-
-//     value = ticks.value;
-//     ns = getIntervalNs(value);
-//     true_ns = Math.max(ns - (new Date() - start_time) - (start_time - end_time - ns), 0);
-//     console.log(true_ns, new Date() - end_time - ns, new Date() - start_time)
-//     clock = setTimeout(beep, true_ns);
-//     end_time = new Date()
-//     // console.log(clock, getIntervalNs(value), new Date() - t2)
-// }
-
 // Utils
 
 function getIntervalNs(ticks) {
@@ -83,4 +68,6 @@ function getIntervalNs(ticks) {
 // Event listeners
 
 button.addEventListener("click", launchMetronome);
+
+
 
